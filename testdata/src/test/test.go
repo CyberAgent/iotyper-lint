@@ -1,5 +1,5 @@
 // Package testdata contains test cases for the iotyper linter.
-package testdata
+package test
 
 // Basic iota usage without type (should trigger warning)
 const (
@@ -7,7 +7,7 @@ const (
 )
 
 // Single-line const declarations
-const SingleLineWithoutType = iota // want "iota used without type specification"
+const SingleLineWithoutType = iota  // want "iota used without type specification"
 const SingleLineWithType int = iota // OK: has type
 
 // Multiple constants with inherited iota
