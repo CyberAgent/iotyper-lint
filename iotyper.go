@@ -1,4 +1,4 @@
-package linters
+package iotyper
 
 import (
 	"go/ast"
@@ -6,8 +6,8 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/golangci/plugin-module-register/register"
 	"golang.org/x/tools/go/analysis"
+	"golang.org/x/tools/go/analysis/passes/inspect"
 )
 
 const (
@@ -18,34 +18,17 @@ const (
 	nolintCommentPrefix = "//nolint:"
 )
 
-// plugin implements the golangci-lint plugin interface
-type plugin struct{}
-
-var _ register.LinterPlugin = new(plugin)
-
-func init() {
-	register.Plugin(name, New)
-}
-
-func New(_ any) (register.LinterPlugin, error) {
-	return &plugin{}, nil
-}
-
-func (p *plugin) BuildAnalyzers() ([]*analysis.Analyzer, error) {
-	analyzer := &analysis.Analyzer{
-		Name: name,
-		Doc:  doc,
-		Run:  p.run,
-	}
-	return []*analysis.Analyzer{analyzer}, nil
-}
-
-func (p *plugin) GetLoadMode() string {
-	return register.LoadModeSyntax
+var Analyzer = &analysis.Analyzer{
+	Name: name,
+	Doc:  doc,
+	Run:  run,
+	Requires: []*analysis.Analyzer{
+		inspect.Analyzer,
+	},
 }
 
 // run performs the actual linting logic for the analyzer.
-func (p *plugin) run(pass *analysis.Pass) (any, error) {
+func run(pass *analysis.Pass) (any, error) {
 	for _, f := range pass.Files {
 		// Get file information to check if it's a test file
 		filePos := pass.Fset.File(f.Pos())
