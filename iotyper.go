@@ -6,6 +6,7 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/golangci/plugin-module-register/register"
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/inspect"
 )
@@ -25,6 +26,24 @@ var Analyzer = &analysis.Analyzer{
 	Requires: []*analysis.Analyzer{
 		inspect.Analyzer,
 	},
+}
+
+func init() {
+	register.Plugin(Analyzer.Name, New)
+}
+
+type PluginTmpl struct{}
+
+func New(_ any) (register.LinterPlugin, error) {
+	return &PluginTmpl{}, nil
+}
+
+func (p *PluginTmpl) BuildAnalyzers() ([]*analysis.Analyzer, error) {
+	return []*analysis.Analyzer{Analyzer}, nil
+}
+
+func (p *PluginTmpl) GetLoadMode() string {
+	return register.LoadModeSyntax
 }
 
 // run performs the actual linting logic for the analyzer.
